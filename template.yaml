@@ -1,0 +1,35 @@
+name: project-template-starter
+description: "A template for creating a new Azure project"
+version: 0.1.0
+
+languages:
+# - go
+# - go-templating
+- kcl
+# - python
+
+# Directory and file renaming patterns
+rename:
+  directories:
+    # Remove language suffix from directories
+    # - pattern: "*-go"
+    #   replacement: "*"
+    #   languages: ["go"]
+    # - pattern: "*-go-templating"
+    #   replacement: "*"
+    #   languages: ["go-templating"]
+    # - pattern: "*-python"
+    #   replacement: "*"
+    #   languages: ["python"]
+    - pattern: "*-kcl"
+      replacement: "*"
+      languages: ["kcl"]
+
+files:
+  # Template files that need variable substitution
+  "README.md":
+    template: true
+    required: true
+  "upbound.yaml":
+    template: true
+    required: true
