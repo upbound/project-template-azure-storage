@@ -59,7 +59,9 @@ jobs:
           password: ${{ secrets.UP_API_TOKEN }}
 
       - name: Initialize project
-        run: up project init -t . generated-project --language ${{ matrix.language }} --test-language ${{ matrix.test-language }}
+        run: |
+          ls -ali
+          up project init -t . generated-project --language ${{ matrix.language }} --test-language ${{ matrix.test-language }}
 
       - name: Build project
         run: cd generated-project && up project build
