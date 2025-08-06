@@ -33,7 +33,6 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
         with:
-          path: ./template
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup Go
@@ -60,7 +59,7 @@ jobs:
           password: ${{ secrets.UP_API_TOKEN }}
 
       - name: Initialize project
-        run: up project init -t ./template generated-project --language ${{ matrix.language }} --test-language ${{ matrix.test-language }}
+        run: up project init -t . generated-project --language ${{ matrix.language }} --test-language ${{ matrix.test-language }}
 
       - name: Build project
         run: cd generated-project && up project build
