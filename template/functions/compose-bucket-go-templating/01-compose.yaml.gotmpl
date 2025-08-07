@@ -1,0 +1,48 @@
+# code: language=yaml
+# yaml-language-server: $schema=../../.up/json/models/index.schema.json
+
+{{- $containerAccessType := "private" }}
+{{- if eq $params.acl "public" }}
+  {{- $containerAccessType = "blob" }}
+{{- end }}
+{{- $accountName := $xr.metadata.name | replace "-" "" }}
+
+---
+apiVersion: azure.upbound.io/v1beta1
+kind: ResourceGroup
+metadata:
+  annotations:
+    {{ setResourceNameAnnotation "rg" }}
+spec:
+  forProvider:
+    location: "{{ $params.location }}"
+
+---
+apiVersion: storage.azure.upbound.io/v1beta1
+kind: Account
+metadata:
+  annotations:
+    {{ setResourceNameAnnotation "account" }}
+  name: {{ $accountName }}
+spec:
+  forProvider:
+    accountTier: "Standard"
+    accountReplicationType: "LRS"
+    location: "{{ $params.location }}"
+    blobProperties:
+      - versioningEnabled: {{ $params.versioning }}
+    infrastructureEncryptionEnabled: true
+    resourceGroupNameSelector:
+      matchControllerRef: true
+
+---
+apiVersion: storage.azure.upbound.io/v1beta1
+kind: Container
+metadata:
+  annotations:
+    {{ setResourceNameAnnotation "container" }}
+spec:
+  forProvider:
+    containerAccessType: "{{ $containerAccessType }}"
+    storageAccountNameSelector:
+      matchControllerRef: true
