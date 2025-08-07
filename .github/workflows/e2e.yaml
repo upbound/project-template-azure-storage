@@ -20,8 +20,8 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        language: [kcl, go]
-        test-language: [kcl]
+        language: [kcl, go, python]
+        test-language: [kcl, python]
     env:
       UP_ORG: ${{ secrets.UP_ORG }}
       UP_API_TOKEN: ${{ secrets.UP_API_TOKEN }}

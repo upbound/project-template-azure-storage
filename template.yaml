@@ -6,7 +6,7 @@ languages:
 - go
 # - go-templating
 - kcl
-# - python
+- python
 
 # Directory and file renaming patterns
 rename:
@@ -18,9 +18,9 @@ rename:
     # - pattern: "*-go-templating"
     #   replacement: "*"
     #   languages: ["go-templating"]
-    # - pattern: "*-python"
-    #   replacement: "*"
-    #   languages: ["python"]
+    - pattern: "*-python"
+      replacement: "*"
+      languages: ["python"]
     - pattern: "*-kcl"
       replacement: "*"
       languages: ["kcl"]
