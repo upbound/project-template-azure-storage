@@ -20,7 +20,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        language: [kcl, go, python]
+        language: [kcl, go, python, go-templating]
         test-language: [kcl, python]
     env:
       UP_ORG: ${{ secrets.UP_ORG }}
