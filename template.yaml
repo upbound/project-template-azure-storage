@@ -3,7 +3,7 @@ description: "A template for creating a new Azure project"
 version: 0.1.0
 
 languages:
-# - go
+- go
 # - go-templating
 - kcl
 # - python
@@ -12,9 +12,9 @@ languages:
 rename:
   directories:
     # Remove language suffix from directories
-    # - pattern: "*-go"
-    #   replacement: "*"
-    #   languages: ["go"]
+    - pattern: "*-go"
+      replacement: "*"
+      languages: ["go"]
     # - pattern: "*-go-templating"
     #   replacement: "*"
     #   languages: ["go-templating"]
