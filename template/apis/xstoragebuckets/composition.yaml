@@ -9,7 +9,7 @@ spec:
   mode: Pipeline
   pipeline:
   - functionRef:
-      name: upbound-project-template-azure-storagecompose-bucket-python
+      name: upbound-project-template-azure-storagecompose-bucket
     step: compose-bucket-kcl
   - functionRef:
       name: crossplane-contrib-function-auto-ready
