@@ -1,0 +1,68 @@
+# code: language=yaml
+# yaml-language-server: $schema=../../.up/json/models/test.schema.json
+
+{{- $expectedXR := `
+- apiVersion: platform.example.com/v1alpha1
+  kind: XStorageBucket
+  metadata:
+    name: example
+  spec:
+    parameters:
+      acl: publicRead
+      location: US
+      versioning: true
+`}}
+
+{{- $expectedBucketBefore := `
+- apiVersion: storage.gcp.upbound.io/v1beta1
+  kind: Bucket
+  metadata:
+    annotations:
+      crossplane.io/composition-resource-name: bucket
+  spec:
+    forProvider:
+      location: US
+      versioning:
+      - enabled: true
+`}}
+
+{{- $observedBucket := `
+- apiVersion: storage.gcp.upbound.io/v1beta1
+  kind: Bucket
+  metadata:
+    annotations:
+      crossplane.io/composition-resource-name: bucket
+      crossplane.io/external-name: example-bucket
+    name: example-bucket
+  spec:
+    forProvider:
+      location: US
+      versioning:
+      - enabled: true
+`}}
+
+{{- $expectedBucketAfter := `
+- apiVersion: storage.gcp.upbound.io/v1beta1
+  kind: Bucket
+  metadata:
+    annotations:
+      crossplane.io/composition-resource-name: bucket
+    name: example-bucket
+  spec:
+    forProvider:
+      location: US
+      versioning:
+      - enabled: true
+`}}
+
+{{- $expectedACL := `
+- apiVersion: storage.gcp.upbound.io/v1beta1
+  kind: BucketACL
+  metadata:
+    annotations:
+      crossplane.io/composition-resource-name: acl
+  spec:
+    forProvider:
+      bucket: example-bucket
+      predefinedAcl: publicRead
+`}}

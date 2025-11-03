@@ -1,0 +1,51 @@
+# code: language=yaml
+# yaml-language-server: $schema=../../.up/json/models/test.schema.json
+
+{{- $gcp_project_id := env "UP_GCP_PROJECT_ID" }}
+{{- $gcp_creds := (env "UP_GCP_CREDS") | b64enc }}
+
+items:
+- apiVersion: meta.dev.upbound.io/v1alpha1
+  kind: E2ETest
+  metadata:
+    name: e2etest-xstoragebucket
+  spec:
+    cleanupTimeoutSeconds: 600
+    crossplane:
+      autoUpgrade:
+        channel: Rapid
+      state: Running
+    defaultConditions:
+      - Ready
+    extraResources:
+      - apiVersion: gcp.upbound.io/v1beta1
+        kind: ProviderConfig
+        metadata:
+          name: default
+        spec:
+          credentials:
+            secretRef:
+              key: credentials
+              name: gcp-credentials
+              namespace: crossplane-system
+            source: Secret
+          projectID: {{ print $gcp_project_id }}
+      - apiVersion: v1
+        data:
+          credentials: {{ print $gcp_creds }}
+        kind: Secret
+        metadata:
+          name: gcp-credentials
+          namespace: crossplane-system
+    manifests:
+      - apiVersion: platform.example.com/v1alpha1
+        kind: XStorageBucket
+        metadata:
+          name: uptest-bucket-xr-kcl
+        spec:
+          parameters:
+            acl: private
+            location: EU
+            versioning: true
+    skipDelete: false
+    timeoutSeconds: 300

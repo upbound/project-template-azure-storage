@@ -1,0 +1,49 @@
+# code: language=yaml
+# yaml-language-server: $schema=../../.up/json/models/test.schema.json
+
+# This test suite validates the creation of resources for the XStorageBucket XR.
+# 
+# Creation of resources happens in two sequential calls to the composition
+# function:
+#
+# 1. The first time the function is called, the bucket has not yet been
+#    created. The ACL resource depends on the bucket's name, so the function
+#    creates only the bucket.
+# 
+# 2. When the function is called again after the bucket has been created, its
+#    name is available, so the ACL can also be created.
+#
+# The test suite contains two tests, one for each of the sequential calls. The
+# second test includes the bucket in its observed resources, triggering creation
+# of the dependent resources.
+
+items:
+- apiVersion: meta.dev.upbound.io/v1alpha1
+  kind: CompositionTest
+  metadata:
+    name: "test-xstoragebucket-bucket-not-yet-created"
+  spec:
+    assertResources:
+      {{- print $expectedXR | indent 6 }}
+      {{- print $expectedBucketBefore | indent 6 }}
+    compositionPath: "apis/xstoragebuckets/composition.yaml"
+    xrPath: "examples/xstoragebuckets/example.yaml"
+    xrdPath: "apis/xstoragebuckets/definition.yaml"
+    timeoutSeconds: 120
+    validate: false
+- apiVersion: meta.dev.upbound.io/v1alpha1
+  kind: CompositionTest
+  metadata:
+    name: "tests-xstoragebucket-bucket-created"
+  spec:
+    observedResources:
+      {{- print $observedBucket | indent 6 }}
+    assertResources:
+      {{- print $expectedXR | indent 6 }}
+      {{- print $expectedBucketAfter | indent 6 }}
+      {{- print $expectedACL | indent 6 }}
+    compositionPath: "apis/xstoragebuckets/composition.yaml"
+    xrPath: "examples/xstoragebuckets/example.yaml"
+    xrdPath: "apis/xstoragebuckets/definition.yaml"
+    timeoutSeconds: 120
+    validate: false
