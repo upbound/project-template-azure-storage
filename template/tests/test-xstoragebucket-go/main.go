@@ -7,59 +7,59 @@ import (
 	"os"
 
 	metav1 "dev.upbound.io/models/io/k8s/meta/v1"
+	storagev1beta1 "dev.upbound.io/models/io/upbound/azure/storage/v1beta1"
+	azv1beta1 "dev.upbound.io/models/io/upbound/azure/v1beta1"
 	metav1alpha1 "dev.upbound.io/models/io/upbound/dev/meta/v1alpha1"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/yaml"
 )
 
 func main() {
-	// Define assertions for the composed resources
+	// Define assertions for the composed resources.
 	// These assertions validate the correct structure and values of the resources
-	// created by the compose-bucket function
+	// created by the compose-bucket function.
 	assertResources := resourcesToItems[metav1alpha1.CompositionTestSpecAssertResourcesItem](
-		// Assert ResourceGroup with correct location
-		map[string]interface{}{
-			"apiVersion": "azure.upbound.io/v1beta1",
-			"kind":       "ResourceGroup",
-			"spec": map[string]interface{}{
-				"forProvider": map[string]interface{}{
-					"location": "eastus",
+		// Assert ResourceGroup with correct location.
+		&azv1beta1.ResourceGroup{
+			APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureUpboundIoV1Beta1),
+			Kind:       ptr.To(azv1beta1.ResourceGroupKindResourceGroup),
+			Spec: &azv1beta1.ResourceGroupSpec{
+				ForProvider: &azv1beta1.ResourceGroupSpecForProvider{
+					Location: ptr.To("eastus"),
 				},
 			},
 		},
-		// Assert Storage Account with correct configuration
-		map[string]interface{}{
-			"apiVersion": "storage.azure.upbound.io/v1beta1",
-			"kind":       "Account",
-			"metadata": map[string]interface{}{
-				"name": "example", // Name transformation (hyphens removed)
+		// Assert Storage Account with correct configuration.
+		&storagev1beta1.Account{
+			APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureUpboundIoV1Beta1),
+			Kind:       ptr.To(storagev1beta1.AccountKindAccount),
+			Metadata: &metav1.ObjectMeta{
+				Name: ptr.To("example"), // Name transformation (hyphens removed).
 			},
-			"spec": map[string]interface{}{
-				"forProvider": map[string]interface{}{
-					"accountTier":                     "Standard",
-					"accountReplicationType":          "LRS",
-					"location":                        "eastus",
-					"infrastructureEncryptionEnabled": true,
-					"blobProperties": []interface{}{
-						map[string]interface{}{
-							"versioningEnabled": true,
-						},
-					},
-					"resourceGroupNameSelector": map[string]interface{}{
-						"matchControllerRef": true,
+			Spec: &storagev1beta1.AccountSpec{
+				ForProvider: &storagev1beta1.AccountSpecForProvider{
+					AccountTier:                     ptr.To("Standard"),
+					AccountReplicationType:          ptr.To("LRS"),
+					Location:                        ptr.To("eastus"),
+					InfrastructureEncryptionEnabled: ptr.To(true),
+					BlobProperties: &[]storagev1beta1.AccountSpecForProviderBlobPropertiesItem{{
+						VersioningEnabled: ptr.To(true),
+					}},
+					ResourceGroupNameSelector: &storagev1beta1.AccountSpecForProviderResourceGroupNameSelector{
+						MatchControllerRef: ptr.To(true),
 					},
 				},
 			},
 		},
-		// Assert Storage Container with correct ACL mapping
-		map[string]interface{}{
-			"apiVersion": "storage.azure.upbound.io/v1beta1",
-			"kind":       "Container",
-			"spec": map[string]interface{}{
-				"forProvider": map[string]interface{}{
-					"containerAccessType": "blob", // ACL "public" maps to "blob"
-					"storageAccountNameSelector": map[string]interface{}{
-						"matchControllerRef": true,
+		// Assert Storage Container with correct ACL mapping.
+		&storagev1beta1.Container{
+			APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureUpboundIoV1Beta1),
+			Kind:       ptr.To(storagev1beta1.ContainerKindContainer),
+			Spec: &storagev1beta1.ContainerSpec{
+				ForProvider: &storagev1beta1.ContainerSpecForProvider{
+					ContainerAccessType: ptr.To("blob"), // ACL "public" maps to "blob".
+					StorageAccountNameSelector: &storagev1beta1.ContainerSpecForProviderStorageAccountNameSelector{
+						MatchControllerRef: ptr.To(true),
 					},
 				},
 			},
@@ -80,7 +80,7 @@ func main() {
 			Validate:        ptr.To(false),
 		},
 	}
-	// Wrap in items array as expected by the test runner
+	// Wrap in items array as expected by the test runner.
 	output := map[string]interface{}{
 		"items": []interface{}{test},
 	}
@@ -91,6 +91,7 @@ func main() {
 	}
 	fmt.Print(string(out))
 }
+
 func toItem[T any](resource interface{}) T {
 	var item T
 	if err := convertViaJSON(&item, resource); err != nil {
@@ -98,6 +99,7 @@ func toItem[T any](resource interface{}) T {
 	}
 	return item
 }
+
 func resourcesToItems[T any](resources ...interface{}) []T {
 	items := make([]T, 0, len(resources))
 	for _, res := range resources {
@@ -105,6 +107,7 @@ func resourcesToItems[T any](resources ...interface{}) []T {
 	}
 	return items
 }
+
 func convertViaJSON(to, from any) error {
 	bs, err := json.Marshal(from)
 	if err != nil {
