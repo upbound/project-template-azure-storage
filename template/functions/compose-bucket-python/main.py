@@ -9,7 +9,7 @@ from .model.com.example.platform.xstoragebucket import v1alpha1
 
 
 def compose(req: fnv1.RunFunctionRequest, rsp: fnv1.RunFunctionResponse):
-    observed_xr = v1alpha1.XStorageBucket(**req.observed.composite.resource)
+    observed_xr = v1alpha1.XStorageBucket(**resource.struct_to_dict(req.observed.composite.resource))
     params = observed_xr.spec.parameters
 
     # Create the resource group
