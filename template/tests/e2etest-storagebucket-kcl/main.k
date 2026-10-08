@@ -15,7 +15,7 @@ _items = [
             defaultConditions: ["Ready"]
             manifests: [
                 platformv1alpha1.StorageBucket{
-                    metadata.name = "uptest-bucket-xr-kcl"
+                    metadata.name = "uptest-azbucket-kcl"
                     metadata.namespace = "default"
                     spec.parameters = {
                         acl = "public"
@@ -52,7 +52,7 @@ _items = [
 
             ]
             skipDelete: False
-            timeoutSeconds: 4500
+            timeoutSeconds: 600
         }
     }
 ]

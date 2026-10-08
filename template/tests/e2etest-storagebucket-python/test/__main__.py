@@ -91,7 +91,7 @@ test = e2etest.E2ETest(
             azure_secret.model_dump(exclude_unset=True, by_alias=True),
         ],
         skipDelete=False,
-        timeoutSeconds=4500,
+        timeoutSeconds=600,
     )
 )
 
