@@ -30,7 +30,8 @@ pip install -e .
 pip install -e ../../.up/python
 ```
 
-Run the last command again after each `pip install -e .`, so your editor picks
-up models that `up` regenerates when you add dependencies or change XRDs.
+**Note:** `pip install -e .` installs a non-editable copy of the models package, so
+re-run `pip install -e ../../.up/python` whenever `up` regenerates the models (after
+you add dependencies or change XRDs) for your editor to pick up the changes.
 
 [proj-docs]: https://docs.upbound.io/core-concepts/projects/
