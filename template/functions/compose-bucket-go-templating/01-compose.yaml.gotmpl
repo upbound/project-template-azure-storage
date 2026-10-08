@@ -8,7 +8,7 @@
 {{- $accountName := $xr.metadata.name | replace "-" "" }}
 
 ---
-apiVersion: azure.upbound.io/v1beta1
+apiVersion: azure.m.upbound.io/v1beta1
 kind: ResourceGroup
 metadata:
   annotations:
@@ -18,7 +18,7 @@ spec:
     location: "{{ $params.location }}"
 
 ---
-apiVersion: storage.azure.upbound.io/v1beta1
+apiVersion: storage.azure.m.upbound.io/v1beta1
 kind: Account
 metadata:
   annotations:
@@ -30,13 +30,13 @@ spec:
     accountReplicationType: "LRS"
     location: "{{ $params.location }}"
     blobProperties:
-      - versioningEnabled: {{ $params.versioning }}
+      versioningEnabled: {{ $params.versioning }}
     infrastructureEncryptionEnabled: true
     resourceGroupNameSelector:
       matchControllerRef: true
 
 ---
-apiVersion: storage.azure.upbound.io/v1beta1
+apiVersion: storage.azure.m.upbound.io/v1beta1
 kind: Container
 metadata:
   annotations:

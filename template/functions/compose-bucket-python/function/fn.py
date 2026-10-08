@@ -5,11 +5,11 @@ from crossplane.function import logging, resource, response
 from crossplane.function.proto.v1 import run_function_pb2 as fnv1
 from crossplane.function.proto.v1 import run_function_pb2_grpc as grpcv1
 
-from models.com.example.platform.xstoragebucket import v1alpha1
+from models.com.example.platform.storagebucket import v1alpha1
 from models.io.k8s.apimachinery.pkg.apis.meta import v1 as metav1
-from models.io.upbound.azure.resourcegroup import v1beta1 as rgv1beta1
-from models.io.upbound.azure.storage.account import v1beta1 as acctv1beta1
-from models.io.upbound.azure.storage.container import v1beta1 as contv1beta1
+from models.io.upbound.m.azure.resourcegroup import v1beta1 as rgv1beta1
+from models.io.upbound.m.azure.storage.account import v1beta1 as acctv1beta1
+from models.io.upbound.m.azure.storage.container import v1beta1 as contv1beta1
 
 
 class FunctionRunner(grpcv1.FunctionRunnerService):
@@ -28,7 +28,7 @@ class FunctionRunner(grpcv1.FunctionRunnerService):
 
         rsp = response.to(req)
 
-        observed_xr = v1alpha1.XStorageBucket(**resource.struct_to_dict(req.observed.composite.resource))
+        observed_xr = v1alpha1.StorageBucket(**resource.struct_to_dict(req.observed.composite.resource))
         params = observed_xr.spec.parameters
 
         # Create the resource group
@@ -58,11 +58,9 @@ class FunctionRunner(grpcv1.FunctionRunnerService):
                     accountReplicationType="LRS",
                     location=params.location,
                     infrastructureEncryptionEnabled=True,
-                    blobProperties=[
-                        acctv1beta1.BlobProperty(
-                            versioningEnabled=params.versioning,
-                        ),
-                    ],
+                    blobProperties=acctv1beta1.BlobProperties(
+                        versioningEnabled=params.versioning,
+                    ),
                     resourceGroupNameSelector=acctv1beta1.ResourceGroupNameSelector(
                         matchControllerRef=True
                     ),

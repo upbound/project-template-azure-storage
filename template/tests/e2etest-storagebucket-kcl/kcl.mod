@@ -1,5 +1,5 @@
 [package]
-name = "e2etest-xstoragebucket-kcl"
+name = "e2etest-storagebucket-kcl"
 version = "0.0.1"
 
 [dependencies]

@@ -1,6 +1,6 @@
 import models.com.example.platform.v1alpha1 as platformv1alpha1
-import models.io.upbound.azure.v1beta1 as azurev1beta1
-import models.io.upbound.azure.storage.v1beta1 as storagev1beta1
+import models.io.upbound.azurem.v1beta1 as azurev1beta1
+import models.io.upbound.azurem.storage.v1beta1 as storagev1beta1
 import models.io.upbound.dev.meta.v1alpha1 as metav1alpha1
 
 # It's a best practice for composition functions to return only fields whose
@@ -9,18 +9,18 @@ import models.io.upbound.dev.meta.v1alpha1 as metav1alpha1
 # function by clearing them in our expected resources.
 _stripDefaults = lambda obj: any -> any {
     obj | {
-        spec.deletionPolicy = Undefined
         spec.managementPolicies = Undefined
     }
 }
 
 _items = [
     metav1alpha1.CompositionTest{
-        metadata.name="test-xstoragebucket-kcl"
+        metadata.name="test-storagebucket-kcl"
         spec= {
             assertResources: [
-                platformv1alpha1.XStorageBucket{
+                platformv1alpha1.StorageBucket{
                     metadata.name: "example"
+                    metadata.namespace: "default"
                     spec: {
                         parameters: {
                             acl: "public"
@@ -50,11 +50,9 @@ _items = [
                         accountTier: "Standard"
                         accountReplicationType: "LRS"
                         location: "eastus"
-                        blobProperties = [
-                            {
-                                versioningEnabled = True
-                            }
-                        ]
+                        blobProperties = {
+                            versioningEnabled = True
+                        }
                         infrastructureEncryptionEnabled = True
                         resourceGroupNameSelector = {
                             matchControllerRef: True
@@ -75,9 +73,9 @@ _items = [
                     }
                 })
             ]
-            compositionPath: "apis/xstoragebuckets/composition.yaml"
-            xrPath: "examples/xstoragebuckets/example.yaml"
-            xrdPath: "apis/xstoragebuckets/definition.yaml"
+            compositionPath: "apis/storagebuckets/composition.yaml"
+            xrPath: "examples/storagebuckets/example.yaml"
+            xrdPath: "apis/storagebuckets/definition.yaml"
             timeoutSeconds: 120
             validate: False
         }

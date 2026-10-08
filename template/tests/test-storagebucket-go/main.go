@@ -7,9 +7,9 @@ import (
 	"os"
 
 	metav1 "dev.upbound.io/models/io/k8s/meta/v1"
-	storagev1beta1 "dev.upbound.io/models/io/upbound/azure/storage/v1beta1"
-	azv1beta1 "dev.upbound.io/models/io/upbound/azure/v1beta1"
 	metav1alpha1 "dev.upbound.io/models/io/upbound/dev/meta/v1alpha1"
+	storagev1beta1 "dev.upbound.io/models/io/upbound/m/azure/storage/v1beta1"
+	azv1beta1 "dev.upbound.io/models/io/upbound/m/azure/v1beta1"
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/yaml"
 )
@@ -21,7 +21,7 @@ func main() {
 	assertResources := resourcesToItems[metav1alpha1.CompositionTestSpecAssertResourcesItem](
 		// Assert ResourceGroup with correct location.
 		&azv1beta1.ResourceGroup{
-			APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureUpboundIoV1Beta1),
+			APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureMUpboundIoV1Beta1),
 			Kind:       ptr.To(azv1beta1.ResourceGroupKindResourceGroup),
 			Spec: &azv1beta1.ResourceGroupSpec{
 				ForProvider: &azv1beta1.ResourceGroupSpecForProvider{
@@ -31,7 +31,7 @@ func main() {
 		},
 		// Assert Storage Account with correct configuration.
 		&storagev1beta1.Account{
-			APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureUpboundIoV1Beta1),
+			APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureMUpboundIoV1Beta1),
 			Kind:       ptr.To(storagev1beta1.AccountKindAccount),
 			Metadata: &metav1.ObjectMeta{
 				Name: ptr.To("example"), // Name transformation (hyphens removed).
@@ -42,9 +42,9 @@ func main() {
 					AccountReplicationType:          ptr.To("LRS"),
 					Location:                        ptr.To("eastus"),
 					InfrastructureEncryptionEnabled: ptr.To(true),
-					BlobProperties: &[]storagev1beta1.AccountSpecForProviderBlobPropertiesItem{{
+					BlobProperties: &storagev1beta1.AccountSpecForProviderBlobProperties{
 						VersioningEnabled: ptr.To(true),
-					}},
+					},
 					ResourceGroupNameSelector: &storagev1beta1.AccountSpecForProviderResourceGroupNameSelector{
 						MatchControllerRef: ptr.To(true),
 					},
@@ -53,7 +53,7 @@ func main() {
 		},
 		// Assert Storage Container with correct ACL mapping.
 		&storagev1beta1.Container{
-			APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureUpboundIoV1Beta1),
+			APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureMUpboundIoV1Beta1),
 			Kind:       ptr.To(storagev1beta1.ContainerKindContainer),
 			Spec: &storagev1beta1.ContainerSpec{
 				ForProvider: &storagev1beta1.ContainerSpecForProvider{
@@ -69,13 +69,13 @@ func main() {
 		APIVersion: ptr.To(metav1alpha1.CompositionTestAPIVersionmetaDevUpboundIoV1Alpha1),
 		Kind:       ptr.To(metav1alpha1.CompositionTestKindCompositionTest),
 		Metadata: &metav1.ObjectMeta{
-			Name: ptr.To(""),
+			Name: ptr.To("test-storagebucket-go"),
 		},
 		Spec: &metav1alpha1.CompositionTestSpec{
 			AssertResources: &assertResources,
-			CompositionPath: ptr.To("apis/xstoragebuckets/composition.yaml"),
-			XrPath:          ptr.To("examples/xstoragebuckets/example.yaml"),
-			XrdPath:         ptr.To("apis/xstoragebuckets/definition.yaml"),
+			CompositionPath: ptr.To("apis/storagebuckets/composition.yaml"),
+			XrPath:          ptr.To("examples/storagebuckets/example.yaml"),
+			XrdPath:         ptr.To("apis/storagebuckets/definition.yaml"),
 			TimeoutSeconds:  ptr.To(120),
 			Validate:        ptr.To(false),
 		},

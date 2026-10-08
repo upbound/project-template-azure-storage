@@ -1,0 +1,26 @@
+# code: language=yaml
+# yaml-language-server: $schema=../../.up/json/models/test.schema.json
+
+# This test validates the creation of resources for the StorageBucket XR.
+#
+# The composition function creates a resource group, a storage account in that
+# resource group, and a storage container in that account. The account and
+# container find their dependencies with matchControllerRef selectors, so all
+# three resources are created in a single call to the composition function.
+
+items:
+- apiVersion: meta.dev.upbound.io/v1alpha1
+  kind: CompositionTest
+  metadata:
+    name: "test-storagebucket-go-templating"
+  spec:
+    assertResources:
+      {{- print $expectedXR | indent 6 }}
+      {{- print $expectedResourceGroup | indent 6 }}
+      {{- print $expectedAccount | indent 6 }}
+      {{- print $expectedContainer | indent 6 }}
+    compositionPath: "apis/storagebuckets/composition.yaml"
+    xrPath: "examples/storagebuckets/example.yaml"
+    xrdPath: "apis/storagebuckets/definition.yaml"
+    timeoutSeconds: 120
+    validate: false

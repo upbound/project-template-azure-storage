@@ -5,8 +5,8 @@ import yaml
 from pydantic import BaseModel
 from models.io.upbound.dev.meta.e2etest import v1alpha1 as e2etest
 from models.io.k8s.apimachinery.pkg.apis.meta import v1 as k8s
-from models.io.upbound.azure.providerconfig import v1beta1 as providerconfig
-from models.com.example.platform.xstoragebucket import v1alpha1 as platformv1alpha1
+from models.io.upbound.m.azure.clusterproviderconfig import v1beta1 as clusterproviderconfig
+from models.com.example.platform.storagebucket import v1alpha1 as platformv1alpha1
 
 
 class Secret(BaseModel):
@@ -20,12 +20,13 @@ class Secret(BaseModel):
 azure_creds = os.environ.get("UP_AZURE_CREDS", "")
 encoded_creds = base64.b64encode(azure_creds.encode()).decode()
 
-# Define the XStorageBucket manifest
-xstorage_bucket = platformv1alpha1.XStorageBucket(
+# Define the StorageBucket manifest
+storage_bucket = platformv1alpha1.StorageBucket(
     apiVersion="platform.example.com/v1alpha1",
-    kind="XStorageBucket",
+    kind="StorageBucket",
     metadata=k8s.ObjectMeta(
-        name="uptest-bucket-xr-python"
+        name="uptest-bucket-xr-python",
+        namespace="default",
     ),
     spec=platformv1alpha1.Spec(
         parameters=platformv1alpha1.Parameters(
@@ -36,17 +37,18 @@ xstorage_bucket = platformv1alpha1.XStorageBucket(
     )
 )
 
-# Define the Azure provider config
-provider_config = providerconfig.ProviderConfig(
-    apiVersion="azure.upbound.io/v1beta1",
-    kind="ProviderConfig",
+# Define the Azure ClusterProviderConfig. Namespaced managed resources use the
+# ClusterProviderConfig named "default" unless they set a providerConfigRef.
+provider_config = clusterproviderconfig.ClusterProviderConfig(
+    apiVersion="azure.m.upbound.io/v1beta1",
+    kind="ClusterProviderConfig",
     metadata=k8s.ObjectMeta(
         name="default"
     ),
-    spec=providerconfig.Spec(
-        credentials=providerconfig.Credentials(
+    spec=clusterproviderconfig.Spec(
+        credentials=clusterproviderconfig.Credentials(
             source="Secret",
-            secretRef=providerconfig.SecretRef(
+            secretRef=clusterproviderconfig.SecretRef(
                 key="credentials",
                 name="azure-secret",
                 namespace="crossplane-system",
@@ -70,7 +72,7 @@ azure_secret = Secret(
 
 test = e2etest.E2ETest(
     metadata=k8s.ObjectMeta(
-        name="xstoragebucket-python",
+        name="e2etest-storagebucket-python",
     ),
     spec = e2etest.Spec(
         crossplane=e2etest.Crossplane(
@@ -82,7 +84,7 @@ test = e2etest.E2ETest(
             "Ready",
         ],
         manifests=[
-            xstorage_bucket.model_dump(exclude_unset=True, by_alias=True),
+            storage_bucket.model_dump(exclude_unset=True, by_alias=True),
         ],
         extraResources=[
             provider_config.model_dump(exclude_unset=True, by_alias=True),

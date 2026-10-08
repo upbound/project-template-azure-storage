@@ -1,16 +1,17 @@
 import yaml
 from models.io.upbound.dev.meta.compositiontest import v1alpha1 as compositiontest
 from models.io.k8s.apimachinery.pkg.apis.meta import v1 as k8s
-from models.io.upbound.azure.resourcegroup import v1beta1 as rgv1beta1
-from models.io.upbound.azure.storage.account import v1beta1 as acctv1beta1
-from models.io.upbound.azure.storage.container import v1beta1 as contv1beta1
-from models.com.example.platform.xstoragebucket import v1alpha1 as platformv1alpha1
+from models.io.upbound.m.azure.resourcegroup import v1beta1 as rgv1beta1
+from models.io.upbound.m.azure.storage.account import v1beta1 as acctv1beta1
+from models.io.upbound.m.azure.storage.container import v1beta1 as contv1beta1
+from models.com.example.platform.storagebucket import v1alpha1 as platformv1alpha1
 
-xStorageBucket = platformv1alpha1.XStorageBucket(
+storageBucket = platformv1alpha1.StorageBucket(
     apiVersion="platform.example.com/v1alpha1",
-    kind="XStorageBucket",
+    kind="StorageBucket",
     metadata=k8s.ObjectMeta(
-        name="example"
+        name="example",
+        namespace="default",
     ),
     spec = platformv1alpha1.Spec(
         parameters = platformv1alpha1.Parameters(
@@ -22,7 +23,7 @@ xStorageBucket = platformv1alpha1.XStorageBucket(
 )
 
 group = rgv1beta1.ResourceGroup(
-    apiVersion="azure.upbound.io/v1beta1",
+    apiVersion="azure.m.upbound.io/v1beta1",
     kind="ResourceGroup",
     metadata=k8s.ObjectMeta(
         annotations={
@@ -37,7 +38,7 @@ group = rgv1beta1.ResourceGroup(
 )
 
 account = acctv1beta1.Account(
-    apiVersion="storage.azure.upbound.io/v1beta1",
+    apiVersion="storage.azure.m.upbound.io/v1beta1",
     kind="Account",
     metadata=k8s.ObjectMeta(
         name="example",
@@ -51,11 +52,9 @@ account = acctv1beta1.Account(
             accountReplicationType="LRS",
             location="eastus",
             infrastructureEncryptionEnabled=True,
-            blobProperties=[
-                acctv1beta1.BlobProperty(
-                    versioningEnabled=True,
-                ),
-            ],
+            blobProperties=acctv1beta1.BlobProperties(
+                versioningEnabled=True,
+            ),
             resourceGroupNameSelector=acctv1beta1.ResourceGroupNameSelector(
                 matchControllerRef=True
             ),
@@ -64,7 +63,7 @@ account = acctv1beta1.Account(
 )
 
 container = contv1beta1.Container(
-    apiVersion="storage.azure.upbound.io/v1beta1",
+    apiVersion="storage.azure.m.upbound.io/v1beta1",
     kind="Container",
     metadata=k8s.ObjectMeta(
         annotations={
@@ -83,18 +82,18 @@ container = contv1beta1.Container(
 
 test = compositiontest.CompositionTest(
     metadata=k8s.ObjectMeta(
-        name="test-xstoragebucket-python",
+        name="test-storagebucket-python",
     ),
     spec = compositiontest.Spec(
         assertResources=[
-            xStorageBucket.model_dump(exclude_unset=True, by_alias=True),
-            group.model_dump(exclude_unset=True, exclude={"spec": {"deletionPolicy", "managementPolicies"}}, by_alias=True),
-            account.model_dump(exclude_unset=True, exclude={"spec": {"deletionPolicy", "managementPolicies"}}, by_alias=True),
-            container.model_dump(exclude_unset=True, exclude={"spec": {"deletionPolicy", "managementPolicies"}}, by_alias=True),
+            storageBucket.model_dump(exclude_unset=True, by_alias=True),
+            group.model_dump(exclude_unset=True, exclude={"spec": {"managementPolicies"}}, by_alias=True),
+            account.model_dump(exclude_unset=True, exclude={"spec": {"managementPolicies"}}, by_alias=True),
+            container.model_dump(exclude_unset=True, exclude={"spec": {"managementPolicies"}}, by_alias=True),
         ],
-        compositionPath="apis/xstoragebuckets/composition.yaml",
-        xrPath="examples/xstoragebuckets/example.yaml",
-        xrdPath="apis/xstoragebuckets/definition.yaml",
+        compositionPath="apis/storagebuckets/composition.yaml",
+        xrPath="examples/storagebuckets/example.yaml",
+        xrdPath="apis/storagebuckets/definition.yaml",
         timeoutSeconds=120,
         validate=False,
     )

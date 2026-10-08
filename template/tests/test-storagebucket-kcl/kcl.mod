@@ -1,5 +1,5 @@
 [package]
-name = "test-xstoragebucket-kcl"
+name = "test-storagebucket-kcl"
 version = "0.0.1"
 
 [dependencies]

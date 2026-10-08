@@ -11,7 +11,8 @@ autocompletion, and linting.
 Read the [control plane project documentation][proj-docs] to learn more about
 control plane projects.
 
-This project defines a new `StorageBucket` API, which is powered by Azure Storage.
+This project defines a new namespaced `StorageBucket` API (Crossplane v2), which
+is powered by Azure Storage.
 
 ## Python editor support
 
