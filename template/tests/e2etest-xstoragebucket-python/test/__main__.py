@@ -1,11 +1,20 @@
 import os
 import base64
-from .model.io.upbound.dev.meta.e2etest import v1alpha1 as e2etest
-from .model.io.k8s.apimachinery.pkg.apis.meta import v1 as k8s
-from .model.io.k8s.api.core import v1 as corev1
-from .model.io.k8s.apimachinery.pkg.apis.core.meta import v1 as corek8s
-from .model.io.upbound.azure.providerconfig import v1beta1 as providerconfig
-from .model.com.example.platform.xstoragebucket import v1alpha1 as platformv1alpha1
+
+import yaml
+from pydantic import BaseModel
+from models.io.upbound.dev.meta.e2etest import v1alpha1 as e2etest
+from models.io.k8s.apimachinery.pkg.apis.meta import v1 as k8s
+from models.io.upbound.azure.providerconfig import v1beta1 as providerconfig
+from models.com.example.platform.xstoragebucket import v1alpha1 as platformv1alpha1
+
+
+class Secret(BaseModel):
+    apiVersion: str = "v1"
+    kind: str = "Secret"
+    metadata: k8s.ObjectMeta
+    type: str = "Opaque"
+    data: dict[str, str] = {}
 
 # Read Azure credentials from environment
 azure_creds = os.environ.get("UP_AZURE_CREDS", "")
@@ -47,10 +56,10 @@ provider_config = providerconfig.ProviderConfig(
 )
 
 # Define the secret containing Azure credentials
-azure_secret = corev1.Secret(
+azure_secret = Secret(
     apiVersion="v1",
     kind="Secret",
-    metadata=corek8s.ObjectMeta(
+    metadata=k8s.ObjectMeta(
         name="azure-secret",
         namespace="crossplane-system"
     ),
@@ -84,5 +93,6 @@ test = e2etest.E2ETest(
     )
 )
 
-# Export items for the test framework
-items = [test.model_dump(exclude_unset=True, by_alias=True)]
+# The test runner expects an "items" array, one entry per test.
+output = {"items": [test.model_dump(by_alias=True, exclude_none=True)]}
+print(yaml.dump(output))
