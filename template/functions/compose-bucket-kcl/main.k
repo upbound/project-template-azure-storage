@@ -1,5 +1,5 @@
-import models.io.upbound.azure.v1beta1 as azurev1beta1
-import models.io.upbound.azure.storage.v1beta1 as storagev1beta1
+import models.io.upbound.azurem.v1beta1 as azurev1beta1
+import models.io.upbound.azurem.storage.v1beta1 as storagev1beta1
 
 oxr = option("params").oxr
 
@@ -31,11 +31,9 @@ _items = [
                 accountTier = "Standard"
                 accountReplicationType = "LRS"
                 location = oxr.spec.parameters.location
-                blobProperties = [
-                    {
-                        versioningEnabled = oxr.spec.parameters.versioning
-                    }
-                ]
+                blobProperties = {
+                    versioningEnabled = oxr.spec.parameters.versioning
+                }
                 infrastructureEncryptionEnabled = True
                 resourceGroupNameSelector = {
                     matchControllerRef: True
