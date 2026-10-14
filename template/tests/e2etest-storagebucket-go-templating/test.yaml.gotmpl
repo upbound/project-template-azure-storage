@@ -1,0 +1,52 @@
+# code: language=yaml
+# yaml-language-server: $schema=../../.up/json/models/test.schema.json
+
+{{- $azure_creds := (env "UP_AZURE_CREDS") | b64enc }}
+
+items:
+- apiVersion: meta.dev.upbound.io/v1alpha1
+  kind: E2ETest
+  metadata:
+    name: e2etest-storagebucket-go-templating
+  spec:
+    cleanupTimeoutSeconds: 600
+    crossplane:
+      autoUpgrade:
+        channel: Rapid
+      state: Running
+    defaultConditions:
+      - Ready
+    extraResources:
+      # Namespaced managed resources use the ClusterProviderConfig named
+      # "default" unless they set a providerConfigRef.
+      - apiVersion: azure.m.upbound.io/v1beta1
+        kind: ClusterProviderConfig
+        metadata:
+          name: default
+        spec:
+          credentials:
+            secretRef:
+              key: credentials
+              name: azure-secret
+              namespace: crossplane-system
+            source: Secret
+      - apiVersion: v1
+        data:
+          credentials: {{ print $azure_creds }}
+        kind: Secret
+        metadata:
+          name: azure-secret
+          namespace: crossplane-system
+    manifests:
+      - apiVersion: platform.example.com/v1alpha1
+        kind: StorageBucket
+        metadata:
+          name: uptest-bucket-xr-gotmpl
+          namespace: default
+        spec:
+          parameters:
+            acl: public
+            location: eastus
+            versioning: true
+    skipDelete: false
+    timeoutSeconds: 600

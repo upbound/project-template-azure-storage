@@ -6,8 +6,8 @@ import (
 
 	"dev.upbound.io/models/com/example/platform/v1alpha1"
 	metav1 "dev.upbound.io/models/io/k8s/meta/v1"
-	storagev1beta1 "dev.upbound.io/models/io/upbound/azure/storage/v1beta1"
-	azv1beta1 "dev.upbound.io/models/io/upbound/azure/v1beta1"
+	storagev1beta1 "dev.upbound.io/models/io/upbound/m/azure/storage/v1beta1"
+	azv1beta1 "dev.upbound.io/models/io/upbound/m/azure/v1beta1"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"google.golang.org/protobuf/testing/protocmp"
@@ -42,12 +42,13 @@ func TestRunFunction(t *testing.T) {
 				req: &fnv1.RunFunctionRequest{
 					Meta: &fnv1.RequestMeta{Tag: "hello"},
 					Observed: &fnv1.State{
-						Composite: toResource(&v1alpha1.XStorageBucket{
+						Composite: toResource(&v1alpha1.StorageBucket{
 							Metadata: &metav1.ObjectMeta{
-								Name: ptr.To("example-xr"),
+								Name:      ptr.To("example-xr"),
+								Namespace: ptr.To("default"),
 							},
-							Spec: &v1alpha1.XStorageBucketSpec{
-								Parameters: &v1alpha1.XStorageBucketSpecParameters{
+							Spec: &v1alpha1.StorageBucketSpec{
+								Parameters: &v1alpha1.StorageBucketSpecParameters{
 									Location:   ptr.To("us-east-1"),
 									ACL:        ptr.To("private"),
 									Versioning: ptr.To(false),
@@ -63,7 +64,7 @@ func TestRunFunction(t *testing.T) {
 					Desired: &fnv1.State{
 						Resources: map[string]*fnv1.Resource{
 							"rg": toResource(&azv1beta1.ResourceGroup{
-								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureUpboundIoV1Beta1),
+								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureMUpboundIoV1Beta1),
 								Kind:       ptr.To(azv1beta1.ResourceGroupKindResourceGroup),
 								Spec: &azv1beta1.ResourceGroupSpec{
 									ForProvider: &azv1beta1.ResourceGroupSpecForProvider{
@@ -72,7 +73,7 @@ func TestRunFunction(t *testing.T) {
 								},
 							}),
 							"account": toResource(&storagev1beta1.Account{
-								APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureUpboundIoV1Beta1),
+								APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureMUpboundIoV1Beta1),
 								Kind:       ptr.To(storagev1beta1.AccountKindAccount),
 								Metadata: &metav1.ObjectMeta{
 									Name: ptr.To("examplexr"),
@@ -86,14 +87,14 @@ func TestRunFunction(t *testing.T) {
 										AccountReplicationType:          ptr.To("LRS"),
 										Location:                        ptr.To("us-east-1"),
 										InfrastructureEncryptionEnabled: ptr.To(true),
-										BlobProperties: &[]storagev1beta1.AccountSpecForProviderBlobPropertiesItem{{
+										BlobProperties: &storagev1beta1.AccountSpecForProviderBlobProperties{
 											VersioningEnabled: ptr.To(false),
-										}},
+										},
 									},
 								},
 							}),
 							"container": toResource(&storagev1beta1.Container{
-								APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureUpboundIoV1Beta1),
+								APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureMUpboundIoV1Beta1),
 								Kind:       ptr.To(storagev1beta1.ContainerKindContainer),
 								Spec: &storagev1beta1.ContainerSpec{
 									ForProvider: &storagev1beta1.ContainerSpecForProvider{
@@ -115,12 +116,13 @@ func TestRunFunction(t *testing.T) {
 				req: &fnv1.RunFunctionRequest{
 					Meta: &fnv1.RequestMeta{Tag: "hello"},
 					Observed: &fnv1.State{
-						Composite: toResource(&v1alpha1.XStorageBucket{
+						Composite: toResource(&v1alpha1.StorageBucket{
 							Metadata: &metav1.ObjectMeta{
-								Name: ptr.To("example-xr"),
+								Name:      ptr.To("example-xr"),
+								Namespace: ptr.To("default"),
 							},
-							Spec: &v1alpha1.XStorageBucketSpec{
-								Parameters: &v1alpha1.XStorageBucketSpecParameters{
+							Spec: &v1alpha1.StorageBucketSpec{
+								Parameters: &v1alpha1.StorageBucketSpecParameters{
 									Location:   ptr.To("us-east-1"),
 									ACL:        ptr.To("private"),
 									Versioning: ptr.To(false),
@@ -129,7 +131,7 @@ func TestRunFunction(t *testing.T) {
 						}),
 						Resources: map[string]*fnv1.Resource{
 							"rg": toResource(&azv1beta1.ResourceGroup{
-								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureUpboundIoV1Beta1),
+								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureMUpboundIoV1Beta1),
 								Kind:       ptr.To(azv1beta1.ResourceGroupKindResourceGroup),
 								Metadata: &metav1.ObjectMeta{
 									Annotations: &map[string]string{
@@ -153,7 +155,7 @@ func TestRunFunction(t *testing.T) {
 					Desired: &fnv1.State{
 						Resources: map[string]*fnv1.Resource{
 							"rg": toResource(&azv1beta1.ResourceGroup{
-								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureUpboundIoV1Beta1),
+								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureMUpboundIoV1Beta1),
 								Kind:       ptr.To(azv1beta1.ResourceGroupKindResourceGroup),
 								Spec: &azv1beta1.ResourceGroupSpec{
 									ForProvider: &azv1beta1.ResourceGroupSpecForProvider{
@@ -162,7 +164,7 @@ func TestRunFunction(t *testing.T) {
 								},
 							}),
 							"account": toResource(&storagev1beta1.Account{
-								APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureUpboundIoV1Beta1),
+								APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureMUpboundIoV1Beta1),
 								Kind:       ptr.To(storagev1beta1.AccountKindAccount),
 								Metadata: &metav1.ObjectMeta{
 									Name: ptr.To("examplexr"),
@@ -176,14 +178,14 @@ func TestRunFunction(t *testing.T) {
 										AccountReplicationType:          ptr.To("LRS"),
 										Location:                        ptr.To("us-east-1"),
 										InfrastructureEncryptionEnabled: ptr.To(true),
-										BlobProperties: &[]storagev1beta1.AccountSpecForProviderBlobPropertiesItem{{
+										BlobProperties: &storagev1beta1.AccountSpecForProviderBlobProperties{
 											VersioningEnabled: ptr.To(false),
-										}},
+										},
 									},
 								},
 							}),
 							"container": toResource(&storagev1beta1.Container{
-								APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureUpboundIoV1Beta1),
+								APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureMUpboundIoV1Beta1),
 								Kind:       ptr.To(storagev1beta1.ContainerKindContainer),
 								Spec: &storagev1beta1.ContainerSpec{
 									ForProvider: &storagev1beta1.ContainerSpecForProvider{
@@ -205,12 +207,13 @@ func TestRunFunction(t *testing.T) {
 				req: &fnv1.RunFunctionRequest{
 					Meta: &fnv1.RequestMeta{Tag: "hello"},
 					Observed: &fnv1.State{
-						Composite: toResource(&v1alpha1.XStorageBucket{
+						Composite: toResource(&v1alpha1.StorageBucket{
 							Metadata: &metav1.ObjectMeta{
-								Name: ptr.To("example-xr"),
+								Name:      ptr.To("example-xr"),
+								Namespace: ptr.To("default"),
 							},
-							Spec: &v1alpha1.XStorageBucketSpec{
-								Parameters: &v1alpha1.XStorageBucketSpecParameters{
+							Spec: &v1alpha1.StorageBucketSpec{
+								Parameters: &v1alpha1.StorageBucketSpecParameters{
 									Location:   ptr.To("us-east-1"),
 									ACL:        ptr.To("private"),
 									Versioning: ptr.To(true),
@@ -219,7 +222,7 @@ func TestRunFunction(t *testing.T) {
 						}),
 						Resources: map[string]*fnv1.Resource{
 							"rg": toResource(&azv1beta1.ResourceGroup{
-								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureUpboundIoV1Beta1),
+								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureMUpboundIoV1Beta1),
 								Kind:       ptr.To(azv1beta1.ResourceGroupKindResourceGroup),
 								Metadata: &metav1.ObjectMeta{
 									Annotations: &map[string]string{
@@ -243,7 +246,7 @@ func TestRunFunction(t *testing.T) {
 					Desired: &fnv1.State{
 						Resources: map[string]*fnv1.Resource{
 							"rg": toResource(&azv1beta1.ResourceGroup{
-								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureUpboundIoV1Beta1),
+								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureMUpboundIoV1Beta1),
 								Kind:       ptr.To(azv1beta1.ResourceGroupKindResourceGroup),
 								Spec: &azv1beta1.ResourceGroupSpec{
 									ForProvider: &azv1beta1.ResourceGroupSpecForProvider{
@@ -252,7 +255,7 @@ func TestRunFunction(t *testing.T) {
 								},
 							}),
 							"account": toResource(&storagev1beta1.Account{
-								APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureUpboundIoV1Beta1),
+								APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureMUpboundIoV1Beta1),
 								Kind:       ptr.To(storagev1beta1.AccountKindAccount),
 								Metadata: &metav1.ObjectMeta{
 									Name: ptr.To("examplexr"),
@@ -266,14 +269,14 @@ func TestRunFunction(t *testing.T) {
 										AccountReplicationType:          ptr.To("LRS"),
 										Location:                        ptr.To("us-east-1"),
 										InfrastructureEncryptionEnabled: ptr.To(true),
-										BlobProperties: &[]storagev1beta1.AccountSpecForProviderBlobPropertiesItem{{
+										BlobProperties: &storagev1beta1.AccountSpecForProviderBlobProperties{
 											VersioningEnabled: ptr.To(true),
-										}},
+										},
 									},
 								},
 							}),
 							"container": toResource(&storagev1beta1.Container{
-								APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureUpboundIoV1Beta1),
+								APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureMUpboundIoV1Beta1),
 								Kind:       ptr.To(storagev1beta1.ContainerKindContainer),
 								Spec: &storagev1beta1.ContainerSpec{
 									ForProvider: &storagev1beta1.ContainerSpecForProvider{
@@ -295,12 +298,13 @@ func TestRunFunction(t *testing.T) {
 				req: &fnv1.RunFunctionRequest{
 					Meta: &fnv1.RequestMeta{Tag: "hello"},
 					Observed: &fnv1.State{
-						Composite: toResource(&v1alpha1.XStorageBucket{
+						Composite: toResource(&v1alpha1.StorageBucket{
 							Metadata: &metav1.ObjectMeta{
-								Name: ptr.To("example-xr"),
+								Name:      ptr.To("example-xr"),
+								Namespace: ptr.To("default"),
 							},
-							Spec: &v1alpha1.XStorageBucketSpec{
-								Parameters: &v1alpha1.XStorageBucketSpecParameters{
+							Spec: &v1alpha1.StorageBucketSpec{
+								Parameters: &v1alpha1.StorageBucketSpecParameters{
 									Location:   ptr.To("us-east-1"),
 									ACL:        ptr.To("public"),
 									Versioning: ptr.To(false),
@@ -309,7 +313,7 @@ func TestRunFunction(t *testing.T) {
 						}),
 						Resources: map[string]*fnv1.Resource{
 							"rg": toResource(&azv1beta1.ResourceGroup{
-								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureUpboundIoV1Beta1),
+								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureMUpboundIoV1Beta1),
 								Kind:       ptr.To(azv1beta1.ResourceGroupKindResourceGroup),
 								Metadata: &metav1.ObjectMeta{
 									Annotations: &map[string]string{
@@ -333,7 +337,7 @@ func TestRunFunction(t *testing.T) {
 					Desired: &fnv1.State{
 						Resources: map[string]*fnv1.Resource{
 							"rg": toResource(&azv1beta1.ResourceGroup{
-								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureUpboundIoV1Beta1),
+								APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureMUpboundIoV1Beta1),
 								Kind:       ptr.To(azv1beta1.ResourceGroupKindResourceGroup),
 								Spec: &azv1beta1.ResourceGroupSpec{
 									ForProvider: &azv1beta1.ResourceGroupSpecForProvider{
@@ -342,7 +346,7 @@ func TestRunFunction(t *testing.T) {
 								},
 							}),
 							"account": toResource(&storagev1beta1.Account{
-								APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureUpboundIoV1Beta1),
+								APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureMUpboundIoV1Beta1),
 								Kind:       ptr.To(storagev1beta1.AccountKindAccount),
 								Metadata: &metav1.ObjectMeta{
 									Name: ptr.To("examplexr"),
@@ -356,14 +360,14 @@ func TestRunFunction(t *testing.T) {
 										AccountReplicationType:          ptr.To("LRS"),
 										Location:                        ptr.To("us-east-1"),
 										InfrastructureEncryptionEnabled: ptr.To(true),
-										BlobProperties: &[]storagev1beta1.AccountSpecForProviderBlobPropertiesItem{{
+										BlobProperties: &storagev1beta1.AccountSpecForProviderBlobProperties{
 											VersioningEnabled: ptr.To(false),
-										}},
+										},
 									},
 								},
 							}),
 							"container": toResource(&storagev1beta1.Container{
-								APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureUpboundIoV1Beta1),
+								APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureMUpboundIoV1Beta1),
 								Kind:       ptr.To(storagev1beta1.ContainerKindContainer),
 								Spec: &storagev1beta1.ContainerSpec{
 									ForProvider: &storagev1beta1.ContainerSpecForProvider{

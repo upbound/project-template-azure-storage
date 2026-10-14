@@ -1,9 +1,10 @@
 # project-template-azure-storage
 
 This template can be used to initialize a new project using `provider-azure`. By
-default it comes with an `XStorageBucket` XRD and a matching composition
-function which creates a Azure Storage bucket. It also creates the corresponding
-unit and e2e tests.
+default it comes with a namespaced `StorageBucket` XRD (Crossplane v2,
+`apiextensions.crossplane.io/v2`) and a matching composition function which
+creates an Azure Storage account and container. It also creates the
+corresponding unit and e2e tests.
 
 ## Usage
 

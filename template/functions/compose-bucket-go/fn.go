@@ -7,8 +7,8 @@ import (
 
 	"dev.upbound.io/models/com/example/platform/v1alpha1"
 	metav1 "dev.upbound.io/models/io/k8s/meta/v1"
-	storagev1beta1 "dev.upbound.io/models/io/upbound/azure/storage/v1beta1"
-	azv1beta1 "dev.upbound.io/models/io/upbound/azure/v1beta1"
+	storagev1beta1 "dev.upbound.io/models/io/upbound/m/azure/storage/v1beta1"
+	azv1beta1 "dev.upbound.io/models/io/upbound/m/azure/v1beta1"
 
 	"github.com/crossplane/function-sdk-go/errors"
 	"github.com/crossplane/function-sdk-go/logging"
@@ -38,7 +38,7 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1.RunFunctionRequest) 
 		return rsp, nil
 	}
 
-	var xr v1alpha1.XStorageBucket
+	var xr v1alpha1.StorageBucket
 	if err := convertViaJSON(&xr, observedComposite.Resource); err != nil {
 		response.Fatal(rsp, errors.Wrap(err, "cannot convert xr"))
 		return rsp, nil
@@ -90,7 +90,7 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1.RunFunctionRequest) 
 
 	// Create ResourceGroup
 	rg := &azv1beta1.ResourceGroup{
-		APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureUpboundIoV1Beta1),
+		APIVersion: ptr.To(azv1beta1.ResourceGroupAPIVersionazureMUpboundIoV1Beta1),
 		Kind:       ptr.To(azv1beta1.ResourceGroupKindResourceGroup),
 		Spec: &azv1beta1.ResourceGroupSpec{
 			ForProvider: &azv1beta1.ResourceGroupSpecForProvider{
@@ -103,7 +103,7 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1.RunFunctionRequest) 
 	// Create Storage Account
 	matchControllerRef := true
 	account := &storagev1beta1.Account{
-		APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureUpboundIoV1Beta1),
+		APIVersion: ptr.To(storagev1beta1.AccountAPIVersionstorageAzureMUpboundIoV1Beta1),
 		Kind:       ptr.To(storagev1beta1.AccountKindAccount),
 		Metadata: &metav1.ObjectMeta{
 			Name: &accountName,
@@ -114,10 +114,8 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1.RunFunctionRequest) 
 				AccountReplicationType:          ptr.To("LRS"),
 				Location:                        params.Location,
 				InfrastructureEncryptionEnabled: ptr.To(true),
-				BlobProperties: &[]storagev1beta1.AccountSpecForProviderBlobPropertiesItem{
-					{
-						VersioningEnabled: params.Versioning,
-					},
+				BlobProperties: &storagev1beta1.AccountSpecForProviderBlobProperties{
+					VersioningEnabled: params.Versioning,
 				},
 				ResourceGroupNameSelector: &storagev1beta1.AccountSpecForProviderResourceGroupNameSelector{
 					MatchControllerRef: &matchControllerRef,
@@ -129,7 +127,7 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1.RunFunctionRequest) 
 
 	// Create Storage Container
 	container := &storagev1beta1.Container{
-		APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureUpboundIoV1Beta1),
+		APIVersion: ptr.To(storagev1beta1.ContainerAPIVersionstorageAzureMUpboundIoV1Beta1),
 		Kind:       ptr.To(storagev1beta1.ContainerKindContainer),
 		Spec: &storagev1beta1.ContainerSpec{
 			ForProvider: &storagev1beta1.ContainerSpecForProvider{
