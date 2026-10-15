@@ -79,7 +79,7 @@ jobs:
           up test run tests/* --e2e --local --skip-control-plane-cleanup
 
       - name: Install kind CLI
-        if: failure()
+        if: always()
         run: |
           curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
           chmod +x ./kind
@@ -113,3 +113,23 @@ jobs:
           name: support-bundle-${{ matrix.language }}-${{ matrix.test-language }}
           path: support-bundle.tar.gz
           retention-days: 1
+
+      # The e2e tests delete their XRs without waiting for the provider to
+      # delete the Azure resources, and failed tests don't delete them at all.
+      # Delete any XRs left on the control plane and wait for the managed
+      # resources to be gone, so the job doesn't leak Azure resource groups.
+      - name: Clean up Azure resources
+        if: always()
+        run: |
+          for cluster in $(kind get clusters); do
+            kind export kubeconfig --name "$cluster"
+            kubectl delete storagebuckets.platform.example.com --all --all-namespaces --wait=false || true
+            for _ in $(seq 60); do
+              [ -z "$(kubectl get managed --all-namespaces -o name 2>/dev/null)" ] && break
+              sleep 10
+            done
+            if [ -n "$(kubectl get managed --all-namespaces -o name 2>/dev/null)" ]; then
+              echo "::warning::Managed resources still exist after 10 minutes; check Azure for leftover resource groups"
+              kubectl get managed --all-namespaces
+            fi
+          done
